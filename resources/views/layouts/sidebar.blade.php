@@ -31,22 +31,7 @@
                                 </a>
                             </li>
                             @endcan
-                            @can('view-any', App\Models\Regions::class)
-                            <li class="nav-item">
-                                <a href="{{ route('all-regions.index') }}" class="nav-link">
-                                    <i class="nav-icon icon ion-md-radio-button-off"></i>
-                                    <p>All Regions</p>
-                                </a>
-                            </li>
-                            @endcan
-                            @can('view-any', App\Models\District::class)
-                            <li class="nav-item">
-                                <a href="{{ route('districts.index') }}" class="nav-link">
-                                    <i class="nav-icon icon ion-md-radio-button-off"></i>
-                                    <p>Districts</p>
-                                </a>
-                            </li>
-                            @endcan
+                           
                 
                 @endauth
                 @auth
