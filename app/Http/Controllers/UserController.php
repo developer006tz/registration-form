@@ -55,27 +55,31 @@ class UserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('create', User::class);
+        
 
         $validated = $request->validate([
             'name' => ['required', 'max:255', 'string'],
             'email' => ['required', 'unique:users,email', 'email'],
-            'password' => ['required'],
             'phone' => ['required', 'max:255', 'string'],
             'dob' => ['required', 'date'],
             'district_id' => ['required', 'exists:districts,id'],
             'regions_id' => ['required', 'exists:regions,id'],
+            'languages' => ['array'],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make('123456');
 
         $user = User::create($validated);
 
-        $user->syncRoles($request->roles);
+        $languages = $request->input('languages', []);
+        foreach ($languages as $language) {
+            $user->userLanguages()->attach($language);
+        }
+
+        $user->syncRoles(Role::findByName('user'));
 
         return redirect()
-            ->route('users.edit', $user)
-            ->withSuccess(__('crud.common.created'));
+            ->route('users.index', $user)->withSuccess(__('crud.common.created'));
     }
 
     /**
