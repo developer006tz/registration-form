@@ -154,6 +154,27 @@ class UserController extends Controller
             $validated['password'] = Hash::make('123456');
         }
 
+
+        try {
+            $update = $user->update($validated);
+
+            $languages = $request->input('languages', []);
+            foreach ($languages as $language) {
+                $data = [
+                    'user_id' => $user->id,
+                    'language_id' => $language,
+                ];
+                $user->userLanguages()->create($data);
+            }
+
+            $user->syncRoles(Role::findByName('user'));
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Something went wrong');
+        }
+
         
 
         return redirect()
