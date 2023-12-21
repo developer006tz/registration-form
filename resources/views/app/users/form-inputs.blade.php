@@ -66,15 +66,15 @@
 
 
     <x-inputs.group class="col-sm-6">
-        <x-inputs.select name="languages" label="Languages" required>
+        <x-inputs.select name="languages[]" label="Language Prophiciency" class="select2" multiple="multiple" required>
             @php $selected = old('languages', ($editing ? $user->languages : '')) @endphp
-            <option disabled {{ empty($selected) ? 'selected' : '' }}>Please select the
-                Languages</option>
+           
             @foreach($languages as $value => $label)
             <option value="{{ $value }}" {{ $selected == $value ? 'selected' : '' }} >{{ $label }}</option>
             @endforeach
         </x-inputs.select>
     </x-inputs.group>
+
 
 
 </div>

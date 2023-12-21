@@ -15,6 +15,8 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
         <script src="https://unpkg.com/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
         
         <!-- Fonts -->
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -64,6 +66,7 @@
         @stack('scripts')
         
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         
         @if (session()->has('success')) 
         <script>
@@ -98,7 +101,13 @@
                         },
                     }
                 })
-            })
+            });
+        </script>
+
+        <script>
+            $(document).ready(function() {
+                $('.select2').select2();
+            });
         </script>
     </body>
 </html>
