@@ -6,6 +6,7 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Regions;
 use App\Models\District;
+use DB;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -68,15 +69,27 @@ class UserController extends Controller
         ]);
 
         $validated['password'] = Hash::make('123456');
+        DB::beginTransaction();
+        try {
+            $user = User::create($validated);
 
-        $user = User::create($validated);
+            $languages = $request->input('languages', []);
+            foreach ($languages as $language) {
+                $data = [
+                    'user_id' => $user->id,
+                    'language_id' => $language,
+                ];
+                $user->userLanguages()->create($data);
+            }
 
-        $languages = $request->input('languages', []);
-        foreach ($languages as $language) {
-            $user->userLanguages()->attach($language);
+            $user->syncRoles(Role::findByName('user'));
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Something went wrong');
         }
-
-        $user->syncRoles(Role::findByName('user'));
+        
 
         return redirect()
             ->route('users.index', $user)->withSuccess(__('crud.common.created'));
@@ -102,12 +115,17 @@ class UserController extends Controller
         $districts = District::pluck('name', 'id');
         $allRegions = Regions::pluck('name', 'id');
 
-        $roles = Role::get();
+        
+
+       
+
+        $languages = Language::pluck('name', 'id');
 
         return view(
             'app.users.edit',
-            compact('user', 'districts', 'allRegions', 'roles')
+            compact('user', 'districts', 'allRegions', 'languages')
         );
+       
     }
 
     /**
@@ -124,7 +142,6 @@ class UserController extends Controller
                 Rule::unique('users', 'email')->ignore($user),
                 'email',
             ],
-            'password' => ['nullable'],
             'phone' => ['required', 'max:255', 'string'],
             'dob' => ['required', 'date'],
             'district_id' => ['required', 'exists:districts,id'],
@@ -134,12 +151,10 @@ class UserController extends Controller
         if (empty($validated['password'])) {
             unset($validated['password']);
         } else {
-            $validated['password'] = Hash::make($validated['password']);
+            $validated['password'] = Hash::make('123456');
         }
 
-        $user->update($validated);
-
-        $user->syncRoles($request->roles);
+        
 
         return redirect()
             ->route('users.edit', $user)
